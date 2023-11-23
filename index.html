@@ -22,12 +22,10 @@
             if (event.key === 'Enter') {
                 let userMessage = this.value;
                 this.value = '';
-    
-                // Mostrar mensaje del usuario en el chat
+        
                 let chatBox = document.getElementById('chat-box');
                 chatBox.innerHTML += `<div>Tú: ${userMessage}</div>`;
-    
-                // Enviar mensaje al servidor
+        
                 fetch('/user-message', {
                     method: 'POST',
                     headers: {
@@ -37,16 +35,21 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    // Extraer y mostrar solo el texto de la respuesta del chatbot
-                    if (data.output && data.output.generic) {
-                        const textResponses = data.output.generic.filter(resp => resp.response_type === 'text').map(resp => resp.text).join('<br>');
-                        chatBox.innerHTML += `<div>Chatbot: ${textResponses}</div>`;
+                if (data.assistantResponse) {
+                const responseText = data.assistantResponse.map(resp => resp.text).join('<br>');
+                chatBox.innerHTML += `<div>Chatbot: ${responseText}</div>`;
                     }
+                    // Asegúrate de que el chat se desplace hacia abajo para mostrar los mensajes más recientes
+                    chatBox.scrollTop = chatBox.scrollHeight;
                 })
-                .catch(error => console.error('Error:', error));
-            }
-        });
-    </script>
+                .catch(error => {
+                    console.error('Error:', error);
+                    chatBox.innerHTML += `<div>Error en la respuesta del chatbot</div>`;
+                });
+
+                        }
+                });
+    </script>    
     
 </body>
 </html>

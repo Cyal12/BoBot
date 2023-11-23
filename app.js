@@ -1,33 +1,57 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const app = express();
 const port = 3000; // Puedes cambiar este número al puerto que prefieras
 const path = require('path');
 
-app.get('/', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.use(bodyParser.json());
-
-require('dotenv').config();
-
+// Importación de módulos para IBM Watson
+const { IamAuthenticator } = require('ibm-watson/auth');
 const AssistantV2 = require('ibm-watson/assistant/v2');
 const DiscoveryV2 = require('ibm-watson/discovery/v2');
-const { IamAuthenticator } = require('ibm-watson/auth');
 
-// Configuración de Watson Assistant
+// Configuración de variables de entorno
+require('dotenv').config();
+
+// Middlewares
+app.use(express.json());
+
+// Configuración de Watson Assistant y Watson Discovery
+const authenticator = new IamAuthenticator({ apikey: process.env.ASSISTANT_APIKEY });
 const assistant = new AssistantV2({
   version: '2023-11-01',
-  authenticator: new IamAuthenticator({ apikey: process.env.ASSISTANT_APIKEY }),
+  authenticator,
   serviceUrl: process.env.ASSISTANT_URL,
 });
 
-// Configuración de Watson Discovery
 const discovery = new DiscoveryV2({
   version: '2023-04-01',
   authenticator: new IamAuthenticator({ apikey: process.env.DISCOVERY_APIKEY }),
   serviceUrl: process.env.DISCOVERY_URL,
+});
+
+// Rutas
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.post('/user-message', async (req, res) => {
+  try {
+    const userMessage = req.body.message;
+    if (!userMessage) {
+      return res.status(400).send({ error: 'No se proporcionó mensaje' });
+    }
+
+    // Obtiene la respuesta del Assistant y, si es necesario, de Discovery
+    const response = await handleUserMessage(userMessage);
+
+    // Log para depuración
+    console.log("Respuesta:", response);
+
+    // Envía la respuesta completa a la interfaz de usuario
+    res.send(response);
+  } catch (error) {
+    console.error('Error al procesar el mensaje:', error);
+    res.status(500).send({ error: 'Error al procesar el mensaje' });
+  }
 });
 
 // Función para enviar mensaje a Watson Assistant
@@ -41,7 +65,7 @@ async function sendMessageToAssistant(message) {
       sessionId: sessionId,
       input: { 'message_type': 'text', 'text': message }
     });
-
+    console.log("Respuesta completa de Watson Assistant:", JSON.stringify(response.result, null, 2));
     return response.result;
   } catch (error) {
     console.error('Error al enviar mensaje a Watson Assistant:', error);
@@ -57,7 +81,7 @@ async function queryDiscovery(query) {
       naturalLanguageQuery: query,
       count: 5
     });
-
+    console.log("Respuesta de Watson Discovery:", response.result);
     return response.result;
   } catch (error) {
     console.error('Error al consultar Watson Discovery:', error);
@@ -69,40 +93,34 @@ async function queryDiscovery(query) {
 async function handleUserMessage(userMessage) {
   try {
     const assistantResponse = await sendMessageToAssistant(userMessage);
-    // Verificar si la respuesta de Assistant incluye una acción de búsqueda
-    if (assistantResponse.output.actions && assistantResponse.output.actions[0].type === "search") {
-      // Enviar consulta a Watson Discovery
-      const discoveryQuery = assistantResponse.output.actions[0].parameters.query;
-      const discoveryResults = await queryDiscovery(discoveryQuery);
-      return { assistantResponse, discoveryResults }; // Devuelve ambos resultados
-    } else {
-      // Si no es una acción de búsqueda, devuelve solo la respuesta de Assistant
-      return { assistantResponse };
+    let discoveryResults = null;
+
+    // Verificar si hay una acción de tipo "search" en la respuesta
+    const searchAction = assistantResponse.output.generic.find(element => element.response_type === "search");
+    if (searchAction) {
+      console.log("Acción de búsqueda encontrada");
+      // Aquí puedes ajustar cómo obtienes la consulta para Discovery
+      const discoveryQuery = searchAction.text; 
+      discoveryResults = await queryDiscovery(discoveryQuery);
     }
-    
+
+    // Construir una respuesta que incluya todos los elementos necesarios
+    const response = {
+      assistantResponse: assistantResponse.output.generic, // Incluye respuestas de tipo text, option, etc.
+      discoveryResults: discoveryResults // Puede ser null si no se realizó una búsqueda
+    };
+
+    return response;
   } catch (error) {
-    console.error('Error al manejar el mensaje del usuario:', error, assistantResponse);
+    console.error('Error en handleUserMessage:', error);
     throw error;
   }
 }
 
-
-
-// Ruta POST para manejar los mensajes del usuario
-app.post('/user-message', async (req, res) => {
-  try {
-    const userMessage = req.body.message;
-    if (!userMessage) {
-      return res.status(400).send({ error: 'No se proporcionó mensaje' });
-    }
-
-    const response = await handleUserMessage(userMessage);
-    console.log("Respuesta:", response);
-    res.send(response);
-  } catch (error) {
-    console.error('Error al procesar el mensaje:', error);
-    res.status(500).send({ error: 'Error al procesar el mensaje' });
-  }
+// Middleware de manejo de errores
+app.use((err, _req, res, _next) => {
+  console.error(err);
+  res.status(500).send({ error: 'Ocurrió un error en el servidor' });
 });
 
 // Iniciar el servidor
