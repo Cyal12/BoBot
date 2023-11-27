@@ -14,7 +14,7 @@
 <body>
     <div id="chat-container">
         <div id="chat-box"></div>
-        <input type="text" id="user-input" placeholder="Escribe tu mensaje aquí...">
+        <input type="text" id="user-input" placeholder="Write your message here...">
     </div>
 
     <script>
@@ -22,10 +22,10 @@
             if (event.key === 'Enter') {
                 let userMessage = this.value;
                 this.value = '';
-        
+
                 let chatBox = document.getElementById('chat-box');
-                chatBox.innerHTML += `<div>Tú: ${userMessage}</div>`;
-        
+                chatBox.innerHTML += `<div id="user-message">Tú: ${userMessage}</div>`;
+
                 fetch('/user-message', {
                     method: 'POST',
                     headers: {
@@ -33,29 +33,122 @@
                     },
                     body: JSON.stringify({ message: userMessage }),
                 })
-                .then(response => response.json())
+                    .then(response => response.json())
                     .then(data => {
                         if (data.assistantResponse) {
                             data.assistantResponse.forEach(element => {
                                 if (element.response_type === 'text') {
                                     // Mostrar respuestas de texto
-                                    chatBox.innerHTML += `<div>Chatbot: ${element.text}</div>`;
+                                    chatBox.innerHTML += `<div id="bot-message">Chatbot: ${element.text}</div>`;
                                 } else if (element.response_type === 'search' && element.primary_results) {
                                     // Mostrar respuestas de búsqueda
                                     element.primary_results.forEach(result => {
                                         if (result.answers) {
                                             const answersText = result.answers.map(answer => `<div>${answer.text}</div>`).join('<br>');
-                                            chatBox.innerHTML += `<div>Respuestas de búsqueda:<br>${answersText}</div>`;
+                                            chatBox.innerHTML += `<div id="bot-message">Respuestas de búsqueda:<br>${answersText}</div>`;
                                         }
                                     });
+                                } else if (element.response_type === 'option') {
+                                    // Crear botones para las opciones
+                                    let buttonsHTML = '';
+                                    element.options.forEach(option => {
+                                        buttonsHTML += `<button class="response-button">${option.label}</button>`;
+                                    });
+                                    chatBox.innerHTML += `<div id="bot-message">${buttonsHTML}</div>`;
                                 }
+                            });
+
+                            // Agregar el evento onclick a los botones después de crearlos
+                            const buttons = chatBox.querySelectorAll('.response-button');
+                            buttons.forEach(button => {
+                                button.addEventListener('click', function() {
+                                    const responseText = this.textContent;
+                                    sendResponse(responseText);
+                                });
                             });
                         }
                         chatBox.scrollTop = chatBox.scrollHeight;
-                    })
+                    });
             }
+        });
+
+        // Función para enviar respuesta al servidor
+        function sendResponse(responseText) {
+            // URL del endpoint en tu servidor que se comunica con Watson Assistant
+            const url = 'http://localhost:3000/user-message';
+
+            // Datos a enviar
+            const data = {
+                message: responseText
+            };
+
+            // Opciones para la solicitud fetch
+            const fetchOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            };
+
+            // Realizar la solicitud
+            fetch(url, fetchOptions)
+                .then(response => response.json())
+                .then(data => {
+                    // Manejar la respuesta del servidor si es necesario
+                    console.log('Respuesta del servidor:', data);
+
+                    // Actualizar el chat con la respuesta del servidor
+                    updateChat(data);
+                })
+                .catch(error => {
+                    console.error('Error al enviar la respuesta:', error);
                 });
-    </script>    
-    
-</body>
-</html>
+        }
+
+        // Función para habilitar la capacidad de hacer clic en los botones
+        function enableButtonClickListener() {
+            const buttons = document.querySelectorAll('.response-button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const responseText = this.textContent;
+                    sendResponse(responseText);
+                });
+            });
+        }
+
+        // Inicialmente, habilitar la capacidad de hacer clic en los botones
+        enableButtonClickListener();
+
+        // Función para actualizar el chat con la respuesta del servidor
+        function updateChat(data) {
+            const chatBox = document.getElementById('chat-box');
+
+            if (data.assistantResponse) {
+                data.assistantResponse.forEach(element => {
+                    if (element.response_type === 'text') {
+                        // Mostrar respuestas de texto
+                        chatBox.innerHTML += `<div id="bot-message">Chatbot: ${element.text}</div>`;
+                    } else if (element.response_type === 'search' && element.primary_results) {
+                        // Mostrar respuestas de búsqueda
+                        element.primary_results.forEach(result => {
+                            if (result.answers) {
+                                const answersText = result.answers.map(answer => `<div>${answer.text}</div>`).join('<br>');
+                                chatBox.innerHTML += `<div id="bot-message">Respuestas de búsqueda:<br>${answersText}</div>`;
+                            }
+                        });
+                    } else if (element.response_type === 'option') {
+                        // Crear botones para las opciones
+                        let buttonsHTML = '';
+                        element.options.forEach(option => {
+                            buttonsHTML += `<button class="response-button">${option.label}</button>`;
+                        });
+                        chatBox.innerHTML += `<div id="bot-message">${buttonsHTML}</div>`;
+                    }
+                });
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+    </body>
+    </html>

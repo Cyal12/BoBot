@@ -54,17 +54,24 @@ app.post('/user-message', async (req, res) => {
   }
 });
 
+// Declarar una variable global para almacenar el ID de sesión
+let sessionId = null;
+
 // Función para enviar mensaje a Watson Assistant
 async function sendMessageToAssistant(message) {
   try {
-    const sessionIdResponse = await assistant.createSession({ assistantId: process.env.ASSISTANT_ID });
-    const sessionId = sessionIdResponse.result.session_id;
+    // Verificar si ya hay una sesión existente
+    if (!sessionId) {
+      const sessionIdResponse = await assistant.createSession({ assistantId: process.env.ASSISTANT_ID });
+      sessionId = sessionIdResponse.result.session_id;
+    }
 
     const response = await assistant.message({
       assistantId: process.env.ASSISTANT_ID,
       sessionId: sessionId,
       input: { 'message_type': 'text', 'text': message }
     });
+
     console.log("Respuesta completa de Watson Assistant:", JSON.stringify(response.result, null, 2));
     return response.result;
   } catch (error) {
@@ -72,6 +79,7 @@ async function sendMessageToAssistant(message) {
     throw error;
   }
 }
+
 
 // Función para realizar consulta a Watson Discovery
 async function queryDiscovery(query) {
