@@ -95,17 +95,23 @@ async function handleUserMessage(userMessage) {
     const assistantResponse = await sendMessageToAssistant(userMessage);
     let discoveryResults = null;
 
-    // Verificar si hay una acción de tipo "search" en la respuesta
+    // Verificar si hay una acción de tipo "search" en la respuesta de Watson Assistant
     const searchAction = assistantResponse.output.generic.find(element => element.response_type === "search");
     if (searchAction) {
       console.log("Acción de búsqueda encontrada");
       // Aquí puedes ajustar cómo obtienes la consulta para Discovery
-      const discoveryQuery = searchAction.text; 
+      const discoveryQuery = searchAction.text;
       discoveryResults = await queryDiscovery(discoveryQuery);
+
+      // Asegurarse de que discoveryResults tenga la estructura esperada
+      if (!discoveryResults || !discoveryResults.results) {
+        console.log("No se encontraron resultados de Discovery o la estructura de los datos es incorrecta");
+        discoveryResults = null; // Asegurar que discoveryResults sea null si no hay resultados válidos
+      }
     }
 
     // Construir una respuesta que incluya todos los elementos necesarios
-    const response = {
+    let response = {
       assistantResponse: assistantResponse.output.generic, // Incluye respuestas de tipo text, option, etc.
       discoveryResults: discoveryResults // Puede ser null si no se realizó una búsqueda
     };
@@ -116,6 +122,7 @@ async function handleUserMessage(userMessage) {
     throw error;
   }
 }
+
 
 // Middleware de manejo de errores
 app.use((err, _req, res, _next) => {

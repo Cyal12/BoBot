@@ -34,20 +34,26 @@
                     body: JSON.stringify({ message: userMessage }),
                 })
                 .then(response => response.json())
-                .then(data => {
-                if (data.assistantResponse) {
-                const responseText = data.assistantResponse.map(resp => resp.text).join('<br>');
-                chatBox.innerHTML += `<div>Chatbot: ${responseText}</div>`;
-                    }
-                    // Asegúrate de que el chat se desplace hacia abajo para mostrar los mensajes más recientes
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    chatBox.innerHTML += `<div>Error en la respuesta del chatbot</div>`;
-                });
-
+                    .then(data => {
+                        if (data.assistantResponse) {
+                            data.assistantResponse.forEach(element => {
+                                if (element.response_type === 'text') {
+                                    // Mostrar respuestas de texto
+                                    chatBox.innerHTML += `<div>Chatbot: ${element.text}</div>`;
+                                } else if (element.response_type === 'search' && element.primary_results) {
+                                    // Mostrar respuestas de búsqueda
+                                    element.primary_results.forEach(result => {
+                                        if (result.answers) {
+                                            const answersText = result.answers.map(answer => `<div>${answer.text}</div>`).join('<br>');
+                                            chatBox.innerHTML += `<div>Respuestas de búsqueda:<br>${answersText}</div>`;
+                                        }
+                                    });
+                                }
+                            });
                         }
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    })
+            }
                 });
     </script>    
     
