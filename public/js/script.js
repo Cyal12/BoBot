@@ -4,7 +4,7 @@ document.getElementById('user-input').addEventListener('keypress', function (eve
         this.value = '';
 
         let chatBox = document.getElementById('chat-box');
-        chatBox.innerHTML += `<div class="message user-message"><img src="https://t3.ftcdn.net/jpg/04/15/35/64/360_F_415356406_40uPqc7ZvgdkRpWpt7JVb1YcssihXQrS.jpg" alt="User" class="user-img">${userMessage}</div>`;
+        chatBox.innerHTML += `<div class="message user-message">${userMessage}</div>`;
 
         fetch('/user-message', {
             method: 'POST',
@@ -34,7 +34,7 @@ document.getElementById('user-input').addEventListener('keypress', function (eve
                             element.options.forEach(option => {
                                 buttonsHTML += `<button class="response-button">${option.label}</button>`;
                             });
-                            chatBox.innerHTML += `<div class="bot-message">${buttonsHTML}</div>`;
+                            chatBox.innerHTML += `<div class="bot-message button">${buttonsHTML}</div>`;
                         }
                     });
 
