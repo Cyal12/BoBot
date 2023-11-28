@@ -8,19 +8,35 @@ body {
 }
 
 #chat-container {
-    width: 100%;
-    height: 100%;
+    padding-top: 50px;
+    padding-bottom: 55px;
     margin: 0;
-    background-color: #d4ffff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 60px;
+    height: 60px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    border-radius: 50%;
+    background: url('https://vcaperu.com/wp-content/uploads/2019/07/ibm-watson2-o4tvd7z712243mx4vupr2jn310horo30tj95gl_1c6b88244cd22af3dc443e5014478133.png') no-repeat center center;
+    background-size: cover;
+    transition: width 0.3s, height 0.3s;
     overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
 
+#chat-container:fullscreen {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
 }
 
 #chat-box {
     height: calc(100% - 40px);
     overflow-y: auto;
-    padding: 10px;
+    padding: 40px 10px 10px;
     background-color: #e9eff5;
     display: flex;
     flex-direction: column;
@@ -43,6 +59,71 @@ body {
     margin-bottom: 10px;
     display: flex;
     align-items: center;
+}
+
+#chat-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: url('https://vcaperu.com/wp-content/uploads/2019/07/ibm-watson2-o4tvd7z712243mx4vupr2jn310horo30tj95gl_1c6b88244cd22af3dc443e5014478133.png') no-repeat center center;
+    background-size: cover;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+}
+
+#minimize-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    width: 25px;
+    height: 25px;
+    background: url('https://pic.onlinewebfonts.com/thumbnails/icons_420951.svg') no-repeat center center;
+    background-size: contain;
+    border: none;
+    cursor: pointer;
+}
+
+#fullscreen-button {
+    background: url('https://icon-library.com/images/fullscreen-icon-vector/fullscreen-icon-vector-21.jpg') no-repeat center center;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    width: 25px;
+    height: 25px;
+    background-size: contain;
+    border: none;
+    cursor: pointer;
+}
+
+#chat-container.expanded {
+    width: 350px;
+    height: 500px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    border-radius: 10px;
+    transition: width 0.3s, height 0.3s;
+    overflow: hidden;
+    opacity: 1;
+    pointer-events: all;
+    background: #dde3ea;
+}
+
+#chat-container.fullscreen {
+    width: 100vw;   /* 100% del ancho de la ventana */
+    height: 100vh;  /* 100% del alto de la ventana */
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    left: 0;
+    border-radius: 0;
 }
 
 .user-message {
@@ -70,7 +151,7 @@ body {
 .response-button {
     padding: 5px 10px;
     background-color: transparent;
-    color: #007bff;
+    color: #1e1f22;
     border: 2px solid #007bff;
     border-radius: 5px;
     margin: 5px;

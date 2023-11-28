@@ -1,3 +1,25 @@
+document.getElementById('chat-button').addEventListener('click', function() {
+    var chatContainer = document.getElementById('chat-container');
+    chatContainer.classList.toggle('expanded');
+});
+
+document.getElementById('minimize-button').addEventListener('click', function(e) {
+    var chatContainer = document.getElementById('chat-container');
+    if (chatContainer.classList.contains('expanded')) {
+        chatContainer.classList.remove('expanded');
+    }
+    e.stopPropagation(); // Prevents the chat-container click event from firing
+});
+document.getElementById('fullscreen-button').addEventListener('click', function() {
+    var chatContainer = document.getElementById('chat-container');
+    if (chatContainer.classList.contains('fullscreen')) {
+        chatContainer.classList.remove('fullscreen');
+    } else {
+        chatContainer.classList.add('fullscreen');
+    }
+});
+
+
 document.getElementById('user-input').addEventListener('keypress', function (event) {
     if (event.key === 'Enter') {
         let userMessage = this.value;
@@ -130,4 +152,5 @@ function updateChat(data) {
     }
     chatBox.scrollTop = chatBox.scrollHeight;
     chatBox.style.scrollBehavior = 'smooth';
+
 }
