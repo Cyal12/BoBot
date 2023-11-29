@@ -1,14 +1,23 @@
+// Estado para rastrear si el mensaje de bienvenida se ha mostrado
+let isWelcomeMessageShown = false;
+
 document.getElementById('chat-button').addEventListener('click', function() {
     var chatContainer = document.getElementById('chat-container');
     chatContainer.classList.toggle('expanded');
 
-    var chatButton = document.getElementById('chat-button');
-    if (chatButton.style.display === 'none') {
-        chatButton.style.display = 'block';
-    } else {
-        chatButton.style.display = 'none';
+    // Verificar si se debe mostrar el mensaje de bienvenida
+    if (!isWelcomeMessageShown) {
+        // Agregar mensaje de bienvenida
+        var chatBox = document.getElementById('chat-box');
+        chatBox.innerHTML += `<div class="message bot-message"><img src="https://avatars.githubusercontent.com/u/10017763?s=280&v=4" alt="Bot" class="bot-img">Welcome to BoBot :D ! How can I help you today?</div>`;
+        isWelcomeMessageShown = true; // Actualizar el estado
     }
+
+    var chatButton = document.getElementById('chat-button');
+    chatButton.style.display = chatContainer.classList.contains('expanded') ? 'none' : 'block';
 });
+
+
 
 
 document.getElementById('minimize-button').addEventListener('click', function(e) {
