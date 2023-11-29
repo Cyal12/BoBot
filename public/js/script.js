@@ -1,15 +1,28 @@
 document.getElementById('chat-button').addEventListener('click', function() {
     var chatContainer = document.getElementById('chat-container');
     chatContainer.classList.toggle('expanded');
+
+    var chatButton = document.getElementById('chat-button');
+    if (chatButton.style.display === 'none') {
+        chatButton.style.display = 'block';
+    } else {
+        chatButton.style.display = 'none';
+    }
 });
+
 
 document.getElementById('minimize-button').addEventListener('click', function(e) {
     var chatContainer = document.getElementById('chat-container');
+    var chatButton = document.getElementById('chat-button');
+
     if (chatContainer.classList.contains('expanded')) {
         chatContainer.classList.remove('expanded');
+        chatButton.style.display = 'block';
     }
-    e.stopPropagation(); // Prevents the chat-container click event from firing
+
+    e.stopPropagation();
 });
+
 document.getElementById('fullscreen-button').addEventListener('click', function() {
     var chatContainer = document.getElementById('chat-container');
     if (chatContainer.classList.contains('fullscreen')) {

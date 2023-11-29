@@ -38,13 +38,30 @@ body {
 
 #user-input {
     width: 100%;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    padding: 12px;
-    box-sizing: border-box;
-    font-size: 18px;
+    border: 1px solid #a9b9d2;
+    border-radius: 22px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    font-size: 1em;
+    line-height: 2;
+    color: #333;
+    background-color: #fff;
+    margin: 1% 0;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    outline: none;
 }
+
+#chat-container.expanded #user-input {
+    box-sizing: border-box;
+    width: 100%;
+
+}
+
+
+#user-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.8);
+}
+
 
 .message {
     animation: slideIn 0.5s ease-out;
@@ -57,17 +74,27 @@ body {
 
 #chat-button {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    background: url('https://vcaperu.com/wp-content/uploads/2019/07/ibm-watson2-o4tvd7z712243mx4vupr2jn310horo30tj95gl_1c6b88244cd22af3dc443e5014478133.png') no-repeat center center;
-    background-size: cover;
+    bottom: 0;
+    right: -80px;
+    width: 165px;
+    height: 80px;
+    background-color: #c5d9fe;
     border: none;
     cursor: pointer;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border-top-left-radius: 80px;
+    border-top-right-radius: 80px;
+    background-image: url('https://pic.onlinewebfonts.com/thumbnails/icons_382883.svg');
+    background-repeat: no-repeat;
+    background-position: 25% 80%;
+    background-size: 25%;
+    overflow: hidden;
 }
+
+
+
+
+
 
 #minimize-button {
     position: absolute;
@@ -86,7 +113,7 @@ body {
     background: url('https://icon-library.com/images/fullscreen-icon-vector/fullscreen-icon-vector-21.jpg') no-repeat center center;
     position: absolute;
     top: 10px;
-    left: 10px;
+    right: 50px;
     z-index: 10;
     width: 25px;
     height: 25px;
@@ -96,8 +123,8 @@ body {
 }
 
 #chat-container.expanded {
-    width: 30%;
-    height: 70%;
+    width: 20%;
+    height: 60%;
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -106,7 +133,7 @@ body {
     overflow: hidden;
     opacity: 1;
     pointer-events: all;
-    background: #dde3ea;
+    background: linear-gradient(to bottom, #c7d6f3 20%, white 20%);
 }
 
 #chat-container.fullscreen {
