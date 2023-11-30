@@ -190,6 +190,33 @@ body {
     transition: color 0.3s, border-color 0.3s, transform 0.2s;
 }
 
+/* Estilo para botones desactivados */
+.response-button:disabled {
+    opacity: 0.5; /* Hace el botón más transparente */
+    background-color: #cccccc; /* Cambia el color de fondo */
+    transition: all 0.3s ease; /* Suaviza la transición de los cambios de estilo */
+    cursor: not-allowed;
+
+}
+
+/* Animación para botones desactivados */
+@keyframes disabledButtonAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Aplicar la animación a los botones desactivados */
+.response-button:disabled {
+    animation: disabledButtonAnimation 1s ease;
+}
+
 .response-button:hover {
     color: #0056b3;
     border-color: #0056b3;
