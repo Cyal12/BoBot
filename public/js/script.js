@@ -94,8 +94,18 @@ document.getElementById('user-input').addEventListener('keypress', function (eve
     }
 });
 
+// Función para desactivar todos los botones de respuesta
+function disableResponseButtons() {
+    const buttons = document.querySelectorAll('.response-button');
+    buttons.forEach(button => {
+        button.disabled = true;
+    });
+}
+
+
 // Función para enviar respuesta al servidor
 function sendResponse(responseText) {
+    disableResponseButtons();
     // URL del endpoint en tu servidor que se comunica con Watson Assistant
     const url = 'http://localhost:3000/user-message';
 
@@ -132,12 +142,14 @@ function sendResponse(responseText) {
 function enableButtonClickListener() {
     const buttons = document.querySelectorAll('.response-button');
     buttons.forEach(button => {
+        button.disabled = false; // Habilitar el botón
         button.addEventListener('click', function () {
             const responseText = this.textContent;
             sendResponse(responseText);
         });
     });
 }
+
 
 // Inicialmente, habilitar la capacidad de hacer clic en los botones
 enableButtonClickListener();
