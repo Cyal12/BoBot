@@ -165,7 +165,16 @@ function updateChat(data) {
                 element.options.forEach(option => {
                     buttonsHTML += `<button class="response-button">${option.label}</button>`;
                 });
-                chatBox.innerHTML += `<div class="bot-message">${buttonsHTML}</div>`;
+                chatBox.innerHTML += `<div class="bot-message button">${buttonsHTML}</div>`;
+
+                // Agregar el evento onclick a los botones después de crearlos
+                const buttons = chatBox.querySelectorAll('.response-button');
+                buttons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const responseText = this.textContent;
+                        sendResponse(responseText);
+                    });
+                });
             }
         });
     }
