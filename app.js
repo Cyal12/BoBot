@@ -7,6 +7,7 @@ const path = require('path');
 const {IamAuthenticator} = require('ibm-watson/auth');
 const AssistantV2 = require('ibm-watson/assistant/v2');
 const DiscoveryV2 = require('ibm-watson/discovery/v2');
+const {marked} = require("marked");
 
 // Configuración de variables de entorno
 require('dotenv').config();
@@ -45,7 +46,9 @@ app.post('/user-message', async (req, res) => {
         const response = await handleUserMessage(userMessage);
 
         // Log para depuración
-        console.log("Respuesta:", response);
+        console.log(marked('**Markdown test**'));
+
+
 
         // Envía la respuesta completa a la interfaz de usuario
         res.send(response);

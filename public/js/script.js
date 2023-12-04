@@ -1,25 +1,23 @@
 // Estado para rastrear si el mensaje de bienvenida se ha mostrado
+
 let isWelcomeMessageShown = false;
 
 document.getElementById('chat-button').addEventListener('click', function() {
-    var chatContainer = document.getElementById('chat-container');
+    const chatContainer = document.getElementById('chat-container');
     chatContainer.classList.toggle('expanded');
     if (!isWelcomeMessageShown) {
-        var chatBox = document.getElementById('chat-box');
+        const chatBox = document.getElementById('chat-box');
         chatBox.innerHTML += `<div class="message bot-message"><img src="https://avatars.githubusercontent.com/u/10017763?s=280&v=4" alt="Bot" class="bot-img">Welcome to BoBot :D ! How can I help you today?</div>`;
         isWelcomeMessageShown = true; //
     }
 
-    var chatButton = document.getElementById('chat-button');
+    const chatButton = document.getElementById('chat-button');
     chatButton.style.display = chatContainer.classList.contains('expanded') ? 'none' : 'block';
 });
 
-
-
-
 document.getElementById('minimize-button').addEventListener('click', function(e) {
-    var chatContainer = document.getElementById('chat-container');
-    var chatButton = document.getElementById('chat-button');
+    const chatContainer = document.getElementById('chat-container');
+    const chatButton = document.getElementById('chat-button');
 
     if (chatContainer.classList.contains('expanded')) {
         chatContainer.classList.remove('expanded');
@@ -30,7 +28,7 @@ document.getElementById('minimize-button').addEventListener('click', function(e)
 });
 
 document.getElementById('fullscreen-button').addEventListener('click', function() {
-    var chatContainer = document.getElementById('chat-container');
+    const chatContainer = document.getElementById('chat-container');
     if (chatContainer.classList.contains('fullscreen')) {
         chatContainer.classList.remove('fullscreen');
     } else {
@@ -59,8 +57,9 @@ document.getElementById('user-input').addEventListener('keypress', function (eve
                 if (data.assistantResponse) {
                     data.assistantResponse.forEach(element => {
                         if (element.response_type === 'text') {
+                            const convertedText = marked.parse(element.text);
                             // Mostrar respuestas de texto
-                            chatBox.innerHTML += `<div class="message bot-message"><img src="https://avatars.githubusercontent.com/u/10017763?s=280&v=4" alt="Bot" class="bot-img">${element.text}</div>`;
+                            chatBox.innerHTML += `<div class="message bot-message"><img src="https://avatars.githubusercontent.com/u/10017763?s=280&v=4" alt="Bot" class="bot-img">${convertedText}</div>`;
                         } else if (element.response_type === 'search' && element.primary_results) {
                             // Mostrar respuestas de búsqueda
                             element.primary_results.forEach(result => {
@@ -161,8 +160,9 @@ function updateChat(data) {
     if (data.assistantResponse) {
         data.assistantResponse.forEach(element => {
             if (element.response_type === 'text') {
+                const convertedText = marked.parse(element.text);
                 // Mostrar respuestas de texto
-                chatBox.innerHTML += `<div class="message bot-message"><img src="https://avatars.githubusercontent.com/u/10017763?s=280&v=4" alt="Bot" class="bot-img">${element.text}</div>`;
+                chatBox.innerHTML += `<div class="message bot-message"><img src="https://avatars.githubusercontent.com/u/10017763?s=280&v=4" alt="Bot" class="bot-img">${convertedText}</div>`;
             } else if (element.response_type === 'search' && element.primary_results) {
                 // Mostrar respuestas de búsqueda
                 element.primary_results.forEach(result => {
@@ -172,7 +172,6 @@ function updateChat(data) {
                     }
                 });
             } else if (element.response_type === 'option') {
-                // Crear botones para las opciones
                 let buttonsHTML = '';
                 element.options.forEach(option => {
                     buttonsHTML += `<button class="response-button">${option.label}</button>`;
