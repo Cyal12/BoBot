@@ -173,6 +173,20 @@ body {
     display: flex;
 }
 
+.bot-message-link {
+    display: block;
+    margin-top: 10px;
+    color: #1a0dab;
+    text-decoration: none;
+    font-size: 12px;
+    margin-left: 15%;
+}
+
+.bot-message-link:hover {
+    text-decoration: underline;
+    color: #007daa;
+}
+
 .message img {
     width: 30px;
     height: 30px;
@@ -180,6 +194,13 @@ body {
     margin: 0 10px;
     float: left;
 }
+
+.message:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
 .button {
     margin-left: 20px;
     background-color: transparent;
