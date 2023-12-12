@@ -91,6 +91,41 @@ function createMessageElement(message, className, url = null) {
     return messageDiv;
 }
 
+function createMessageElementDiscovery(message, className, url = null) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', className);
+
+    if (className === 'bot-message-discovery') {
+        message = message.charAt(0).toUpperCase() + message.slice(1);
+        const botImg = document.createElement('img');
+        botImg.src = "https://connect.redhat.com/s3api/prod-s3api/discoicon.png";
+        botImg.alt = "Bot";
+        botImg.classList.add('bot-img');
+        messageDiv.appendChild(botImg);
+
+        const messageText = document.createElement('span');
+        messageText.innerHTML = message;
+        messageDiv.appendChild(messageText);
+
+        if (url) {
+            const linkElement = document.createElement('a');
+            linkElement.href = url;
+            linkElement.textContent = "More information";
+            linkElement.className = 'bot-message-link';
+            linkElement.target = "_blank";
+            linkElement.rel = "noopener noreferrer";
+            messageDiv.appendChild(linkElement);
+        }
+    } else {
+        messageDiv.textContent = message;
+    }
+    return messageDiv;
+}
+
+function handlePause(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
+
 function scrollToBottom() {
     const chatBox = document.getElementById('chat-box');
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -107,35 +142,76 @@ function sendUserMessage(message) {
         .catch(error => console.error('Error:', error));
 }
 
+function startTypingAnimation() {
+    const chatBox = document.getElementById('chat-box');
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', 'bot-message');
+
+    const typingDiv = document.createElement('div');
+    typingDiv.id = 'typing-animation';
+    typingDiv.classList.add('typing-animation');
+
+    for (let i = 0; i < 3; i++) {
+        const dot = document.createElement('span');
+        dot.classList.add('typing-dot');
+        dot.style.animationDelay = `${0.2 * i}s`;
+        dot.textContent = '.';
+        typingDiv.appendChild(dot);
+    }
+
+    messageDiv.appendChild(typingDiv);
+    chatBox.appendChild(messageDiv);
+    scrollToBottom();
+}
+function stopTypingAnimation() {
+    const typingDiv = document.getElementById('typing-animation');
+    if (typingDiv) {
+        typingDiv.remove();
+    }
+}
 function processAssistantResponse(data) {
     const chatBox = document.getElementById('chat-box');
     if (data.assistantResponse) {
+        let promise = Promise.resolve();
         data.assistantResponse.forEach(element => {
-            if (element.response_type === 'text') {
-                const textResponse = createMessageElement(marked.parse(element.text), 'bot-message');
-                chatBox.appendChild(textResponse);
-            } else if (element.response_type === 'search' && element.primary_results) {
-                element.primary_results.forEach(result => {
-                    if (result.answers) {
-                        result.answers.forEach(answer => {
-                            const answerElement = createMessageElement(answer.text, 'bot-message', result.url);
-                            chatBox.appendChild(answerElement);
+            if (element.response_type === 'pause') {
+                promise = promise.then(() => {
+                    startTypingAnimation();
+                    return handlePause(element.time);
+                }).then(() => {
+                    stopTypingAnimation();
+                });
+            } else {
+                promise = promise.then(() => {
+                    if (element.response_type === 'text') {
+                        const textResponse = createMessageElement(marked.parse(element.text), 'bot-message');
+                        chatBox.appendChild(textResponse);
+
+                    } else if (element.response_type === 'search' && element.primary_results) {
+                        element.primary_results.forEach(result => {
+                            if (result.answers) {
+                                result.answers.forEach(answer => {
+                                    const answerElement = createMessageElementDiscovery(answer.text, 'bot-message-discovery', result.url);
+                                    chatBox.appendChild(answerElement);
+                                });
+                            }
                         });
+
+                    } else if (element.response_type === 'option') {
+                        const buttonsDiv = document.createElement('div');
+                        buttonsDiv.classList.add('bot-message', 'button');
+                        element.options.forEach(option => {
+                            const button = document.createElement('button');
+                            button.textContent = option.label;
+                            button.classList.add('response-button');
+                            button.addEventListener('click', () => handleButtonResponse(option.label));
+                            buttonsDiv.appendChild(button);
+                        });
+                        chatBox.appendChild(buttonsDiv);
                     }
+                    scrollToBottom();
                 });
-            } else if (element.response_type === 'option') {
-                const buttonsDiv = document.createElement('div');
-                buttonsDiv.classList.add('bot-message', 'button');
-                element.options.forEach(option => {
-                    const button = document.createElement('button');
-                    button.textContent = option.label;
-                    button.classList.add('response-button');
-                    button.addEventListener('click', () => handleButtonResponse(option.label));
-                    buttonsDiv.appendChild(button);
-                });
-                chatBox.appendChild(buttonsDiv);
             }
-            scrollToBottom();
         });
     }
 }

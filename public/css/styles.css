@@ -1,6 +1,6 @@
 body {
     font-family: Arial, sans-serif;
-    font-size: 16px;
+    font-size: 14px;
     background-color: #ffffff;
     margin: 0;
     padding: 0;
@@ -16,15 +16,11 @@ body {
     bottom: 20px;
     right: 20px;
     border-radius: 50%;
-    background: url('https://vcaperu.com/wp-content/uploads/2019/07/ibm-watson2-o4tvd7z712243mx4vupr2jn310horo30tj95gl_1c6b88244cd22af3dc443e5014478133.png') no-repeat center center;
-    background-size: cover;
     transition: width 0.3s, height 0.3s;
     overflow: hidden;
     opacity: 0;
     pointer-events: none;
 }
-
-
 
 #chat-box {
     height: calc(78% - 40px);
@@ -166,7 +162,14 @@ body {
 }
 
 .bot-message {
-    background-color: #f0f0f0;
+    background-color: #eef9fc;
+    align-self: flex-end;
+    margin-right: auto;
+    flex-wrap: wrap;
+    display: flex;
+}
+.bot-message-discovery {
+    background-color: #e3f5f5;
     align-self: flex-end;
     margin-right: auto;
     flex-wrap: wrap;
@@ -217,16 +220,32 @@ body {
     transition: color 0.3s, border-color 0.3s, transform 0.2s;
 }
 
-/* Estilo para botones desactivados */
-.response-button:disabled {
-    opacity: 0.5; /* Hace el botón más transparente */
-    background-color: #cccccc; /* Cambia el color de fondo */
-    transition: all 0.3s ease; /* Suaviza la transición de los cambios de estilo */
-    cursor: not-allowed;
-
+.typing-animation {
+    font-size: 40px;
+    display: inline-flex;
+    width: 50px;
+    color: #1a0dab;
 }
 
-/* Animación para botones desactivados */
+.typing-dot {
+    display: inline-flex;
+    animation: bounce 1.4s infinite ease-in-out both;
+    margin: 0 0;
+}
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-20px); /* Altura de la animación */ }
+}
+
+
+.response-button:disabled {
+    opacity: 0.5;
+    background-color: #cccccc;
+    transition: all 0.3s ease;
+    cursor: not-allowed;
+}
+
 @keyframes disabledButtonAnimation {
     0% {
         transform: scale(1);
@@ -239,7 +258,6 @@ body {
     }
 }
 
-/* Aplicar la animación a los botones desactivados */
 .response-button:disabled {
     animation: disabledButtonAnimation 1s ease;
 }
