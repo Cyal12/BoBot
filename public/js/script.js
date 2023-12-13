@@ -43,9 +43,9 @@ function handleUserInput(e) {
     }
 }
 
-function appendMessage(message, className, url = null) {
+function appendMessage(message, className, url = null, imageData = null) {
     const chatBox = document.getElementById('chat-box');
-    const messageElement = createMessageElement(message, className, url);
+    const messageElement = createMessageElement(message, className, url, imageData);
     chatBox.appendChild(messageElement);
     scrollToBottom();
 }
@@ -61,7 +61,7 @@ function handleButtonResponse(optionLabel) {
     disableResponseButtons();
 }
 
-function createMessageElement(message, className, url = null) {
+function createMessageElement(message, className, url = null, imageData = null) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', className);
 
@@ -72,18 +72,26 @@ function createMessageElement(message, className, url = null) {
         botImg.classList.add('bot-img');
         messageDiv.appendChild(botImg);
 
-        const messageText = document.createElement('span');
-        messageText.innerHTML = message;
-        messageDiv.appendChild(messageText);
+        if (imageData && imageData.response_type === 'image') {
+            const imageElement = document.createElement('img');
+            imageElement.src = imageData.source;
+            imageElement.alt = imageData.alt_text || 'Image response';
+            imageElement.classList.add('response-image');
+            messageDiv.appendChild(imageElement);
+        } else {
+            const messageText = document.createElement('span');
+            messageText.innerHTML = message;
+            messageDiv.appendChild(messageText);
 
-        if (url) {
-            const linkElement = document.createElement('a');
-            linkElement.href = url;
-            linkElement.textContent = "More information";
-            linkElement.className = 'bot-message-link';
-            linkElement.target = "_blank";
-            linkElement.rel = "noopener noreferrer";
-            messageDiv.appendChild(linkElement);
+            if (url) {
+                const linkElement = document.createElement('a');
+                linkElement.href = url;
+                linkElement.textContent = "More information";
+                linkElement.className = 'bot-message-link';
+                linkElement.target = "_blank";
+                linkElement.rel = "noopener noreferrer";
+                messageDiv.appendChild(linkElement);
+            }
         }
     } else {
         messageDiv.textContent = message;
@@ -163,12 +171,14 @@ function startTypingAnimation() {
     chatBox.appendChild(messageDiv);
     scrollToBottom();
 }
+
 function stopTypingAnimation() {
     const typingDiv = document.getElementById('typing-animation');
     if (typingDiv) {
         typingDiv.remove();
     }
 }
+
 function processAssistantResponse(data) {
     const chatBox = document.getElementById('chat-box');
     if (data.assistantResponse) {
@@ -186,6 +196,10 @@ function processAssistantResponse(data) {
                     if (element.response_type === 'text') {
                         const textResponse = createMessageElement(marked.parse(element.text), 'bot-message');
                         chatBox.appendChild(textResponse);
+
+                    } else if (element.response_type === 'image') {
+                        const imageResponse = createMessageElement('', 'bot-message', null, element);
+                        chatBox.appendChild(imageResponse);
 
                     } else if (element.response_type === 'search' && element.primary_results) {
                         element.primary_results.forEach(result => {

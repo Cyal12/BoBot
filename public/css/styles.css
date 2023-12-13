@@ -1,3 +1,11 @@
+:root {
+    --ds-primary: #007bff;
+    --ds-error: #dc3545;
+    --ds-success: #28a745;
+    --ds-warning: #ffc107;
+    --ds-ambient-0: #f8f9fa;
+}
+
 body {
     font-family: Arial, sans-serif;
     font-size: 14px;
@@ -34,7 +42,7 @@ body {
 #user-input {
     border: 1px solid #a9b9d2;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-    font-size: medium;
+    font-size: small;
     line-height: 2;
     color: #333;
     background-color: #fff;
@@ -62,6 +70,10 @@ body {
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.8);
 }
 
+.bot-image{
+    flex-shrink: 0;
+    flex-basis: auto;
+}
 
 .message {
     animation: slideIn 0.5s ease-out;
@@ -69,7 +81,10 @@ body {
     border-radius: 20px;
     margin-bottom: 10px;
     display: flex;
-    align-items: center;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 1;
 }
 
 #chat-button {
@@ -163,10 +178,9 @@ body {
 
 .bot-message {
     background-color: #eef9fc;
-    align-self: flex-end;
     margin-right: auto;
-    flex-wrap: wrap;
     display: flex;
+    flex-shrink: 1;
 }
 .bot-message-discovery {
     background-color: #e3f5f5;
@@ -193,7 +207,6 @@ body {
 .message img {
     width: 30px;
     height: 30px;
-    border-radius: 50%;
     margin: 0 10px;
     float: left;
     cursor: default;
@@ -276,12 +289,31 @@ span{
     width: 70%;
 }
 
-img{
+.arrow {
     width: 35px;
     height: 35px;
     margin-left: 10px;
     margin-top: 5px;
     cursor: pointer;
+
+}
+
+.message .response-image {
+    max-width: 90%;
+    border-radius: 0;
+    margin-top: 10px;
+    width: auto;
+    height: auto;
+}
+
+
+
+.message h4 {
+    margin: 5px 0;
+}
+
+.message p {
+    margin: 5px 0;
 }
 
 

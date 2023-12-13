@@ -5,7 +5,6 @@ const path = require('path');
 const {IamAuthenticator} = require('ibm-watson/auth');
 const AssistantV2 = require('ibm-watson/assistant/v2');
 const DiscoveryV2 = require('ibm-watson/discovery/v2');
-const {marked} = require("marked");
 
 require('dotenv').config();
 app.use(express.json());
